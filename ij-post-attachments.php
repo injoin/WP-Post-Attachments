@@ -23,6 +23,8 @@ class IJ_Post_Attachments
 {
 
 	/**
+	 * List of methods that are WP actions.
+	 *
 	 * @since   0.0.1a
 	 * @var     array
 	 */
@@ -106,17 +108,16 @@ class IJ_Post_Attachments
 			?>
 			<div class="ij-post-attachment-list">
 				<ul>
-				<?php while ($attachments->have_posts()): $attachments->the_post(); ?>
+				<?php while ($attachments->have_posts()): $atchment = $attachments->next_post(); ?>
 					<li class="ij-post-attachment">
-						<a href="<?php echo wp_get_attachment_thumb_url(get_the_ID()); ?>" onclick="return ShowTB_Attachment(this, <?php the_ID(); ?>);" class="ij-post-attachment-title">
-							<strong><?php the_title(); ?></strong>
-						</a>
-						<?php echo wp_get_attachment_image(get_the_ID(), array(80, 60), true); ?>
+						<div class="ij-post-attachment-title">
+							<a href="<?php echo wp_get_attachment_thumb_url($atchment->ID); ?>" onclick="return ShowTB_Attachment(this, <?php echo $atchment->ID; ?>);"><strong><?php echo $atchment->post_title; ?></strong></a>
+							(<?php echo strtoupper(array_pop(explode('.', get_attached_file($atchment->ID)))); ?>)
+						</div>
+						<?php echo wp_get_attachment_image($atchment->ID, array(80, 60), true); ?>
 						<div style="float:left">
-							<?php echo strtoupper(array_pop(explode('.', get_attached_file(get_the_ID())))); ?>
-							<br />
-							<a href="<?php echo wp_get_attachment_thumb_url(get_the_ID()); ?>" onclick="return ShowTB_Attachment(this, <?php the_ID(); ?>);"><?php _e('Edit'); ?></a><br />
-							<a href="<?php echo wp_nonce_url(admin_url('post.php') . '?action=delete&post=' . get_the_ID(), 'delete-attachment_' . get_the_ID()); ?>" onclick="return Remove_Attachment(this)"><?php _e('Remove'); ?></a>
+							<a href="<?php echo wp_get_attachment_thumb_url($atchment->ID); ?>" onclick="return ShowTB_Attachment(this, <?php echo $atchment->ID; ?>);"><?php _e('Edit'); ?></a><br />
+							<a href="<?php echo wp_nonce_url(admin_url('post.php') . '?action=delete&post=' . $atchment->ID, 'delete-attachment_' . $atchment->ID); ?>" onclick="return Remove_Attachment(this)"><?php _e('Remove'); ?></a>
 						</div>
 					</li>
 				<?php endwhile; ?>
@@ -125,6 +126,8 @@ class IJ_Post_Attachments
 			</div>
 			<script type="text/javascript">
 			function ShowTB_Attachment(obj, ID) {
+				// Because ThickBox removes everything after the TB_iframe parameter,
+				// its better to keep it at the last position
 				tb_show('<?php _e('Edit Media'); ?>',  '<?php echo plugin_dir_url(__FILE__); ?>ij-post-attachments.php?width=630&height=440&attachment_id=' + ID + '&TB_iframe=1');
 
 				return false;
@@ -133,6 +136,7 @@ class IJ_Post_Attachments
 			function Remove_Attachment(obj) {
 				jQuery.ajax({
 					url  : jQuery(obj).attr('href'),
+					// The line below will make WP redirect to our plugin after the deletion
 					data : { _wp_http_referer   : '<?php echo plugin_dir_url(__FILE__); ?>ij-post-attachments.php' }
 				}).done(function(ret) {
 					if (!ret)
@@ -149,25 +153,23 @@ class IJ_Post_Attachments
 
 					width: 160px;
 					max-width: 160px;
-					height: 102px;
-					max-height: 102px;
+					height: 82px;
+					max-height: 82px;
 
 					margin: 0 10px 10px 0;
+					padding: 5px;
+					border: 1px solid #CCC;
+					-webkit-border-radius: 5px;
+					-moz-border-radius: 5px;
+					border-radius: 5px;
+
+					background: #FAFAFA;
 				}
 
-				.ij-post-attachment-title {
-					display: block;
-					margin-bottom: 3px;
-				}
-
-				.ij-post-attachment img {
-					float: left;
-					margin-right: 5px;
-				}
+				.ij-post-attachment-title { display: block; margin-bottom: 3px; }
+				.ij-post-attachment img { float: left; margin-right: 5px; }
 			</style>
 			<?php
-
-			wp_reset_postdata();
 		}
 		else
 		{
@@ -177,13 +179,15 @@ class IJ_Post_Attachments
 	}
 
 	/**
+	 * Initialize the attachment edit pop-up.
+	 *
 	 * @since   0.0.1a
 	 * @param   int $ID
 	 * @return  void
 	 */
 	public function showAttachmentEdit($ID)
 	{
-		add_action('admin_head-media-upload-popup', array($this, 'attachmentIframePopup'));
+		add_action('admin_head-media-upload-popup', array($this, 'attachmentEditHeadIframe'));
 		wp_iframe(array($this, 'attachmentEditIframe'));
 	}
 
@@ -193,8 +197,10 @@ class IJ_Post_Attachments
 	 * @since   0.0.1a
 	 * @return  void
 	 */
-	public function attachmentIframePopup()
+	public function attachmentEditHeadIframe()
 	{
+		// I don't know if all these scripts are really needed by the media edit screen.
+		// They're just there, so they'll be here too :P
 		?>
 		<link rel="stylesheet" type="text/css" href="<?php echo site_url('wp-includes/js/imgareaselect/imgareaselect.css'); ?>" />
 		<script type="text/javascript" src="<?php echo admin_url('load-scripts.php?load=jquery-color,imgareaselect,image-edit,wp-ajax-response'); ?>"></script>
@@ -209,21 +215,25 @@ class IJ_Post_Attachments
 	 */
 	public function attachmentEditIframe()
 	{
-		$url = admin_url('media.php');
-		$id = $_REQUEST['attachment_id'];
+		$url    = admin_url('media.php');
+		$id     = $_REQUEST['attachment_id'];
+		?>
+		<form action="<?php echo $url; ?>" method="post" style="padding:0 10px 10px" class="media-item">
+			<div class="submit"><input type="submit" class="button-primary" value="<?php _e('Update Media'); ?>" /></div>
+			<input type="hidden" name="action" value="editattachment" />
+			<input type="hidden" name="attachment_id" value="<?php echo $id; ?>" />
+		<?php
+			wp_nonce_field('media-form');
+			wp_original_referer_field(true, 'current');
 
-		echo "<form action=\"{$url}\" method=\"post\" style=\"padding:0 10px 10px\" class=\"media-item\">";
-		echo "<div class=\"submit\"><input type=\"submit\" class=\"button-primary\" value=\"" . __('Update Media') . "\" /></div>";
-		echo "<input type=\"hidden\" name=\"action\" value=\"editattachment\" />";
-		echo "<input type=\"hidden\" name=\"attachment_id\" value=\"{$id}\" />";
-		wp_nonce_field('media-form');
-		wp_original_referer_field(true, 'current');
-		echo get_media_item($id, array(
-			'toggle'        => false,
-			'show_title'    => false
-		));
-		echo "<div class=\"submit\"><input type=\"submit\" class=\"button-primary\" value=\"" . __('Update Media') . "\" /></div>";
-		echo "</div>";
+			echo get_media_item($id, array(
+				'toggle'        => false,
+				'show_title'    => false
+			));
+		?>
+			<div class="submit"><input type="submit" class="button-primary" value="<?php _e('Update Media'); ?>" /></div>
+		</form>
+		<?php
 	}
 
 }
