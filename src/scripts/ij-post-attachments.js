@@ -4,6 +4,10 @@ var IJ_Post_Attachments;
 		IJ_Post_Attachments = new InJoin_PostAttachments();
 	});
 
+	/**
+	 * @class
+	 * @constructor
+	 */
 	function InJoin_PostAttachments() {
 		var self = this;
 
@@ -30,14 +34,29 @@ var IJ_Post_Attachments;
 		 */
 		this.dragging = false;
 
+		/**
+		 * Event fired on "sortstart"
+		 * @type    {Function}
+		 * @return  {void}
+		 */
 		this.onStartSorting = function() {
 			self.dragging = true;
 		};
 
+		/**
+		 * Event fired on "sortstop"
+		 * @type    {Function}
+		 * @return  {void}
+		 */
 		this.onStopSorting = function() {
 			self.dragging = false;
 		};
 
+		/**
+		 * Event fired on "sortupdate"
+		 * @type    {Function}
+		 * @return  {void}
+		 */
 		this.onUpdateSorting = function() {
 			setTimeout(function() {
 				if (!self.dragging) {
@@ -51,10 +70,12 @@ var IJ_Post_Attachments;
 						data : { alignment : alignment }
 					});
 				}
-			}, 500);
+			}, 1500);
 		};
 
 		/**
+		 * Opens the ThickBox with the media editing screen
+		 * @type    {Function}
 		 * @return  {Boolean}
 		 */
 		this.showAttachment = function() {
@@ -68,6 +89,8 @@ var IJ_Post_Attachments;
 		};
 
 		/**
+		 * Deletes a media item
+		 * @type    {Function}
 		 * @return  {Boolean}
 		 */
 		this.removeAttachment = function() {
@@ -87,16 +110,23 @@ var IJ_Post_Attachments;
 		};
 
 		// Let's do some jQuerying finally!
+		// Firstly, apply the sortable interaction.
 		$("#ij-post-attachments > ul").sortable({
-			update  : this.onUpdateSorting
+			update  : this.onUpdateSorting,
+			start   : this.onStartSorting,
+			stop    : this.onStopSorting
 		}).disableSelection();
 
+		// Apply the syoHint plugin
 		$('li.ij-post-attachment').autoHint();
 
+		// Bind the Show Attachment behavior to the title and to the Edit links
 		$('a.ij-post-attachment-edit').click(function() {
 			self.showAttachment.call(this);
 			return false;
 		});
+
+		// Bind the Remove Attachment behavior to the Remove link
 		$('a.ij-post-attachment-delete').click(function() {
 			self.removeAttachment.call(this);
 			return false;
