@@ -1,0 +1,20 @@
+.ij-post-attachment {
+	float: left;
+
+	width: 160px;
+	max-width: 160px;
+	height: 82px;
+	max-height: 82px;
+
+	margin: 0 10px 10px 0;
+	padding: 5px;
+	border: 1px solid #CCC;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+
+	background: #FAFAFA;
+}
+
+.ij-post-attachment-title { display: block; margin-bottom: 3px; }
+.ij-post-attachment img { float: left; margin-right: 5px; }

@@ -28,7 +28,15 @@ class IJ_Post_Attachments
 	 * @since   0.0.1a
 	 * @var     array
 	 */
-	private $actions = array('add_meta_boxes');
+	private $actions = array('add_meta_boxes', 'admin_print_styles', 'admin_enqueue_scripts');
+
+	/**
+	 * The URL to the plugin directory
+	 *
+	 * @since   0.0.1a
+	 * @var     string
+	 */
+	private $pluginURL;
 
 	/**
 	 * The singleton instance of this class
@@ -48,6 +56,8 @@ class IJ_Post_Attachments
 	{
 		foreach ($this->actions as $action)
 			add_action($action, array($this, $action));
+
+		$this->pluginURL = plugin_dir_url(__FILE__);
 	}
 
 	/**
@@ -88,6 +98,24 @@ class IJ_Post_Attachments
 		add_meta_box('ij-post-attachments', __('Images and Attachments'), array($this, 'printMetaBox'), null, 'normal', 'high');
 	}
 
+	public function admin_enqueue_scripts()
+	{
+		global $hook_suffix;
+		if ($hook_suffix == 'post.php')
+		{
+			wp_enqueue_script('syoHintUtils', $this->pluginURL . '/scripts/utils.js', array(), '1.0.10');
+			wp_enqueue_script('syoHint', $this->pluginURL . '/scripts/jquery.syoHint.js', array('jquery', 'syoHintUtils'), '1.0.10');
+			wp_enqueue_script('ij-post-attachments', $this->pluginURL . '/scripts/ij-post-attachments.js', array('syoHint', 'jquery-ui-sortable'), '0.0.1');
+		}
+	}
+
+	public function admin_print_styles()
+	{
+		global $hook_suffix;
+		if ($hook_suffix == 'post.php')
+			wp_enqueue_style('ij-post-attachments', $this->pluginURL . '/styles/ij-post-attachments.css', array(), '0.0.1');
+	}
+
 	/**
 	 * Create the meta box below the post editor and list the files
 	 *
@@ -97,78 +125,47 @@ class IJ_Post_Attachments
 	 */
 	public function printMetaBox($post)
 	{
+		?>
+		<p>
+			<a href="<?php echo admin_url('media-upload.php?post_id=' . $post->ID); ?>&TB_iframe=1&width=640&height=693"
+				onclick="return false" class="button-primary thickbox">
+				<?php _e('Add Media'); ?>
+			</a>
+		</p>
+		<?php
 		$attachments = new WP_Query(array(
 			'post_parent'   => $post->ID,
 			'post_type'     => 'attachment',
-			'post_status'   => 'any'
+			'post_status'   => 'any',
+			'orderby'       => 'menu_order',
+			'order'         => 'ASC'
 		));
 
 		if ($attachments->have_posts())
 		{
 			?>
-			<div class="ij-post-attachment-list">
+			<div id="ij-post-attachments-pluginurl" class="hidden"><?php echo plugin_dir_url(__FILE__); ?></div>
+			<div id="ij-post-attachments-editmedia" class="hidden"><?php _e('Edit Media'); ?></div>
+			<div id="ij-post-attachments" class="ij-post-attachment-list">
 				<ul>
 				<?php while ($attachments->have_posts()): $atchment = $attachments->next_post(); ?>
-					<li class="ij-post-attachment">
-						<div class="ij-post-attachment-title">
-							<a href="<?php echo wp_get_attachment_thumb_url($atchment->ID); ?>" onclick="return ShowTB_Attachment(this, <?php echo $atchment->ID; ?>);"><strong><?php echo $atchment->post_title; ?></strong></a>
+					<li class="ij-post-attachment" data-attachmentid="<?php echo $atchment->ID; ?>">
+						<div class="ij-post-attachment-title" title="<?php echo $atchment->post_title; ?>">
+							<a href="<?php echo wp_get_attachment_thumb_url($atchment->ID); ?>" class="ij-post-attachment-edit">
+								<strong><?php echo (strlen($atchment->post_title) > 16) ? (substr($atchment->post_title, 0, 16) . '...') : $atchment->post_title; ?></strong>
+							</a>
 							(<?php echo strtoupper(array_pop(explode('.', get_attached_file($atchment->ID)))); ?>)
 						</div>
 						<?php echo wp_get_attachment_image($atchment->ID, array(80, 60), true); ?>
 						<div style="float:left">
-							<a href="<?php echo wp_get_attachment_thumb_url($atchment->ID); ?>" onclick="return ShowTB_Attachment(this, <?php echo $atchment->ID; ?>);"><?php _e('Edit'); ?></a><br />
-							<a href="<?php echo wp_nonce_url(admin_url('post.php') . '?action=delete&post=' . $atchment->ID, 'delete-attachment_' . $atchment->ID); ?>" onclick="return Remove_Attachment(this)"><?php _e('Remove'); ?></a>
+							<a href="<?php echo wp_get_attachment_thumb_url($atchment->ID); ?>" class="ij-post-attachment-edit"><?php _e('Edit'); ?></a><br />
+							<a href="<?php echo wp_nonce_url(admin_url('post.php') . '?action=delete&post=' . $atchment->ID, 'delete-attachment_' . $atchment->ID); ?>" class="ij-post-attachment-delete"><?php _e('Remove'); ?></a>
 						</div>
 					</li>
 				<?php endwhile; ?>
 				</ul>
 				<div class="clear"></div>
 			</div>
-			<script type="text/javascript">
-			function ShowTB_Attachment(obj, ID) {
-				// Because ThickBox removes everything after the TB_iframe parameter,
-				// its better to keep it at the last position
-				tb_show('<?php _e('Edit Media'); ?>',  '<?php echo plugin_dir_url(__FILE__); ?>ij-post-attachments.php?width=630&height=440&attachment_id=' + ID + '&TB_iframe=1');
-
-				return false;
-			}
-
-			function Remove_Attachment(obj) {
-				jQuery.ajax({
-					url  : jQuery(obj).attr('href'),
-					// The line below will make WP redirect to our plugin after the deletion
-					data : { _wp_http_referer   : '<?php echo plugin_dir_url(__FILE__); ?>ij-post-attachments.php' }
-				}).done(function(ret) {
-					if (!ret)
-						jQuery(obj.parentNode).fadeOut(300, function() {
-							jQuery(this).remove();
-						});
-				});
-				return false;
-			}
-			</script>
-			<style type="text/css">
-				.ij-post-attachment {
-					float: left;
-
-					width: 160px;
-					max-width: 160px;
-					height: 82px;
-					max-height: 82px;
-
-					margin: 0 10px 10px 0;
-					padding: 5px;
-					border: 1px solid #CCC;
-					-webkit-border-radius: 5px;
-					-moz-border-radius: 5px;
-					border-radius: 5px;
-
-					background: #FAFAFA;
-				}
-
-				.ij-post-attachment-title { display: block; margin-bottom: 3px; }
-				.ij-post-attachment img { float: left; margin-right: 5px; }
-			</style>
 			<?php
 		}
 		else
@@ -236,13 +233,43 @@ class IJ_Post_Attachments
 		<?php
 	}
 
+	/**
+	 * @param   array $alignment
+	 * @return  void
+	 */
+	public function realign($alignment)
+	{
+		if (!is_array($alignment))
+			$alignment = array_map('trim', explode(',', $alignment));
+
+		$alignment = array_values($alignment);
+		$count = count($alignment);
+
+		for ($i = 0; $i < $count; $i++)
+		{
+			if (!is_numeric($alignment[$i]))
+				continue;
+
+			$attachment = get_post($alignment[$i]);
+			$attachment->menu_order = $i;
+			wp_update_post($attachment);
+		}
+	}
+
 }
 
 // Direct access + editing image
-require_once(dirname(__FILE__) . '/../../wp-load.php');
+require_once(dirname(__FILE__) . '/../../../wp-load.php');
 $IJ_Post_Attachments = IJ_Post_Attachments::getInstance();
-if (isset($_REQUEST['attachment_id']) && strpos(str_replace('\\', '/', __FILE__), $_SERVER['PHP_SELF']))
+if (strpos(str_replace('\\', '/', __FILE__), $_SERVER['PHP_SELF']))
 {
-	require_once(dirname(__FILE__) . '/../../wp-admin/admin.php');
-	$IJ_Post_Attachments->showAttachmentEdit($_REQUEST['attachment_id']);
+	if (isset($_REQUEST['alignment']))
+	{
+		$IJ_Post_Attachments->realign($_REQUEST['alignment']);
+	}
+	elseif (isset($_REQUEST['attachment_id']))
+	{
+		require_once(dirname(__FILE__) . '/../../../wp-admin/admin.php');
+		$IJ_Post_Attachments->showAttachmentEdit($_REQUEST['attachment_id']);
+	}
 }
