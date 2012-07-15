@@ -28,7 +28,10 @@ class IJ_Post_Attachments
 	 * @since   0.0.1a
 	 * @var     array
 	 */
-	private $actions = array('add_meta_boxes', 'admin_print_styles', 'admin_enqueue_scripts');
+	private $actions = array(
+		'add_meta_boxes', 'admin_print_styles', 'admin_enqueue_scripts',
+		'wp_ajax_ij_realign'
+	);
 
 	/**
 	 * The URL to the plugin directory
@@ -149,16 +152,22 @@ class IJ_Post_Attachments
 			<div id="ij-post-attachments" class="ij-post-attachment-list">
 				<ul>
 				<?php while ($attachments->have_posts()): $atchment = $attachments->next_post(); ?>
-					<li class="ij-post-attachment" data-attachmentid="<?php echo $atchment->ID; ?>">
+					<li class="ij-post-attachment"
+					    data-mimetype="<?php echo $atchment->post_mime_type; ?>"
+					    data-alt="<?php echo get_post_meta(611, '_wp_attachment_image_alt', true); ?>"
+					    data-attachmentid="<?php echo $atchment->ID; ?>"
+					    data-url="<?php echo wp_get_attachment_url($atchment->ID); ?>"
+						data-title="<?php echo $atchment->post_title; ?>">
 						<div class="ij-post-attachment-title" title="<?php echo $atchment->post_title; ?>">
-							<a href="<?php echo wp_get_attachment_thumb_url($atchment->ID); ?>" class="ij-post-attachment-edit">
+							<a href="<?php echo wp_get_attachment_url($atchment->ID); ?>" class="ij-post-attachment-edit">
 								<strong><?php echo (strlen($atchment->post_title) > 16) ? (substr($atchment->post_title, 0, 16) . '...') : $atchment->post_title; ?></strong>
 							</a>
 							(<?php echo strtoupper(array_pop(explode('.', get_attached_file($atchment->ID)))); ?>)
 						</div>
 						<?php echo wp_get_attachment_image($atchment->ID, array(80, 60), true); ?>
 						<div style="float:left">
-							<a href="<?php echo wp_get_attachment_thumb_url($atchment->ID); ?>" class="ij-post-attachment-edit"><?php _e('Edit'); ?></a><br />
+							<a href="#" class="ij-post-attachment-insert"><?php _e('Insert'); ?></a><br />
+							<a href="<?php echo wp_get_attachment_url($atchment->ID); ?>" class="ij-post-attachment-edit"><?php _e('Edit'); ?></a><br />
 							<a href="<?php echo wp_nonce_url(admin_url('post.php') . '?action=delete&post=' . $atchment->ID, 'delete-attachment_' . $atchment->ID); ?>" class="ij-post-attachment-delete"><?php _e('Remove'); ?></a>
 						</div>
 					</li>
@@ -234,11 +243,16 @@ class IJ_Post_Attachments
 	}
 
 	/**
-	 * @param   array $alignment
+	 * Re-align attachments.
+	 *
+	 * @since   0.0.1a
 	 * @return  void
 	 */
-	public function realign($alignment)
+	public function wp_ajax_ij_realign()
 	{
+		header('Content-Type: text/plain');
+
+		$alignment = $_REQUEST['alignment'];
 		if (!is_array($alignment))
 			$alignment = array_map('trim', explode(',', $alignment));
 
@@ -261,15 +275,8 @@ class IJ_Post_Attachments
 // Direct access + editing image
 require_once(dirname(__FILE__) . '/../../../wp-load.php');
 $IJ_Post_Attachments = IJ_Post_Attachments::getInstance();
-if (strpos(str_replace('\\', '/', __FILE__), $_SERVER['PHP_SELF']))
+if (strpos(str_replace('\\', '/', __FILE__), $_SERVER['PHP_SELF']) && isset($_REQUEST['attachment_id']))
 {
-	if (isset($_REQUEST['alignment']))
-	{
-		$IJ_Post_Attachments->realign($_REQUEST['alignment']);
-	}
-	elseif (isset($_REQUEST['attachment_id']))
-	{
-		require_once(dirname(__FILE__) . '/../../../wp-admin/admin.php');
-		$IJ_Post_Attachments->showAttachmentEdit($_REQUEST['attachment_id']);
-	}
+	require_once(dirname(__FILE__) . '/../../../wp-admin/admin.php');
+	$IJ_Post_Attachments->showAttachmentEdit($_REQUEST['attachment_id']);
 }

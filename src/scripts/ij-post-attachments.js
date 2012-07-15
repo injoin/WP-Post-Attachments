@@ -73,13 +73,41 @@ var IJ_Post_Attachments;
 						.appendTo(self.container.find('h3.hndle'));
 
 					$.ajax({
-						url : self.pluginUrl + 'ij-post-attachments.php',
-						data : { alignment : alignment }
+						url : ajaxurl,
+						data : {
+							action : 'ij_realign',
+							alignment : alignment
+						}
 					}).always(function() {
 						self.container.find('h3.hndle img').remove();
 					});
 				}
 			}, 1500);
+		};
+
+		/**
+		 * Insert an attachment in the editor.
+		 * @type    {Function}
+		 * @return  {Boolean}
+		 */
+		this.insertAttachment = function() {
+			var LI = $(this).parents().filter('li:first'),
+				el;
+
+			if (LI.data('mimetype').indexOf('image/') === 0) {
+				el = $('<img />')
+					.addClass('alignnone size-full wp-image-' + LI.data('attachmentid'))
+					.attr({
+						alt     : LI.data('alt'),
+						src     : LI.data('url'),
+						title   : LI.data('title')
+					});
+			} else {
+				el = $('<a/>').text(LI.data('title')).attr('href', LI.data('url'));
+			}
+
+			send_to_editor(el[0].outerHTML);
+			return false;
 		};
 
 		/**
@@ -128,6 +156,12 @@ var IJ_Post_Attachments;
 
 		// Apply the syoHint plugin
 		$('li.ij-post-attachment').autoHint();
+
+		// Bind the Insert Attachment behavior
+		$('a.ij-post-attachment-insert').click(function() {
+			self.insertAttachment.call(this);
+			return false;
+		});
 
 		// Bind the Show Attachment behavior to the title and to the Edit links
 		$('a.ij-post-attachment-edit').click(function() {
