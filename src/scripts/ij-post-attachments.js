@@ -20,13 +20,13 @@ var IJ_Post_Attachments;
 		 * The URL of the plugin's directory
 		 * @type {String}
 		 */
-		this.pluginUrl = $("#ij-post-attachments-pluginurl").text();
+		this.pluginUrl = userSettings.url + 'wp-content/plugins/ij-post-attachments/';
 
 		/**
 		 * The "Edit Media" title.
 		 * @type {String}
 		 */
-		this.editMediaTitle = $("#ij-post-attachments-editmedia").text();
+		this.editMediaTitle = IJ_Post_Attachments_Vars.editMedia;
 
 		/**
 		 * Defines whether we're dragging around or not
@@ -61,13 +61,22 @@ var IJ_Post_Attachments;
 			setTimeout(function() {
 				if (!self.dragging) {
 					var LI = $('li', self.container), i = 0,
-						alignment = [];
+						alignment = [],
+						loader = $('<img />');
+
 					for (; i < LI.length; i++)
 						alignment.push(LI.eq(i).data('attachmentid'));
+
+					loader
+						.attr('src', userSettings.url + 'wp-admin/images/wpspin_light.gif')
+						.addClass('loader')
+						.appendTo(self.container.find('h3.hndle'));
 
 					$.ajax({
 						url : self.pluginUrl + 'ij-post-attachments.php',
 						data : { alignment : alignment }
+					}).always(function() {
+						self.container.find('h3.hndle img').remove();
 					});
 				}
 			}, 1500);

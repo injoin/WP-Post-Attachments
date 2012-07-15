@@ -103,9 +103,11 @@ class IJ_Post_Attachments
 		global $hook_suffix;
 		if ($hook_suffix == 'post.php')
 		{
-			wp_enqueue_script('syoHintUtils', $this->pluginURL . '/scripts/utils.js', array(), '1.0.10');
-			wp_enqueue_script('syoHint', $this->pluginURL . '/scripts/jquery.syoHint.js', array('jquery', 'syoHintUtils'), '1.0.10');
-			wp_enqueue_script('ij-post-attachments', $this->pluginURL . '/scripts/ij-post-attachments.js', array('syoHint', 'jquery-ui-sortable'), '0.0.1');
+			wp_enqueue_script('syoHintUtils', $this->pluginURL . 'scripts/utils.js', array(), '1.0.10');
+			wp_enqueue_script('syoHint', $this->pluginURL . 'scripts/jquery.syoHint.js', array('jquery', 'syoHintUtils'), '1.0.10');
+			wp_enqueue_script('ij-post-attachments', $this->pluginURL . 'scripts/ij-post-attachments.js', array('syoHint', 'jquery-ui-sortable'), '0.0.1');
+
+			wp_localize_script('ij-post-attachments', 'IJ_Post_Attachments_Vars', array('editMedia' => __('Edit Media')));
 		}
 	}
 
@@ -113,7 +115,7 @@ class IJ_Post_Attachments
 	{
 		global $hook_suffix;
 		if ($hook_suffix == 'post.php')
-			wp_enqueue_style('ij-post-attachments', $this->pluginURL . '/styles/ij-post-attachments.css', array(), '0.0.1');
+			wp_enqueue_style('ij-post-attachments', $this->pluginURL . 'styles/ij-post-attachments.css', array(), '0.0.1');
 	}
 
 	/**
@@ -144,8 +146,6 @@ class IJ_Post_Attachments
 		if ($attachments->have_posts())
 		{
 			?>
-			<div id="ij-post-attachments-pluginurl" class="hidden"><?php echo plugin_dir_url(__FILE__); ?></div>
-			<div id="ij-post-attachments-editmedia" class="hidden"><?php _e('Edit Media'); ?></div>
 			<div id="ij-post-attachments" class="ij-post-attachment-list">
 				<ul>
 				<?php while ($attachments->have_posts()): $atchment = $attachments->next_post(); ?>

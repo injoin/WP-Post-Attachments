@@ -1,3 +1,8 @@
+#ij-post-attachments img.loader {
+	padding-left: 3px;
+	vertical-align: middle;
+}
+
 .ij-post-attachment {
 	float: left;
 
@@ -14,7 +19,9 @@
 	border-radius: 5px;
 
 	background: #FAFAFA;
+
+	cursor: move;
 }
 
-.ij-post-attachment-title { display: block; margin-bottom: 3px; }
-.ij-post-attachment img { float: left; margin-right: 5px; }
+.ij-post-attachment-title { display: block; margin-bottom: 3px }
+.ij-post-attachment img { float: left; margin-right: 5px; cursor: default }
