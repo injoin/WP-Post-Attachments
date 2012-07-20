@@ -12,6 +12,7 @@ var IJ_Post_Attachments;
 		var self = this;
 
 		/**
+		 * Container of the items list
 		 * @type {jQuery}
 		 */
 		this.container = $("#ij-post-attachments");
@@ -131,7 +132,7 @@ var IJ_Post_Attachments;
 		 * @return  {Boolean}
 		 */
 		this.removeAttachment = function() {
-			jQuery.ajax({
+			$.ajax({
 				url  : $(this).attr('href'),
 				// The line below will make WP redirect to our plugin after the deletion.
 				// That way, less data will be downloaded.
@@ -146,33 +147,42 @@ var IJ_Post_Attachments;
 			return false;
 		};
 
-		// Let's do some jQuerying finally!
-		// Firstly, apply the sortable interaction.
-		$("#ij-post-attachments > ul").sortable({
-			update  : this.onUpdateSorting,
-			start   : this.onStartSorting,
-			stop    : this.onStopSorting
-		}).disableSelection();
+		/**
+		 * Sets up the widgets and events
+		 * @type    {Function}
+		 * @return  {void}
+		 */
+		this.setup = function() {
+			// Let's do some jQuerying!
+			// Firstly, apply the sortable interaction.
+			$("#ij-post-attachments > ul").sortable({
+				update  : this.onUpdateSorting,
+				start   : this.onStartSorting,
+				stop    : this.onStopSorting
+			}).disableSelection();
 
-		// Apply the syoHint plugin
-		$('li.ij-post-attachment').autoHint();
+			// Apply the syoHint plugin
+			$('li.ij-post-attachment').autoHint();
 
-		// Bind the Insert Attachment behavior
-		$('a.ij-post-attachment-insert').click(function() {
-			self.insertAttachment.call(this);
-			return false;
-		});
+			// Bind the Insert Attachment behavior
+			$('a.ij-post-attachment-insert').click(function() {
+				self.insertAttachment.call(this);
+				return false;
+			});
 
-		// Bind the Show Attachment behavior to the title and to the Edit links
-		$('a.ij-post-attachment-edit').click(function() {
-			self.showAttachment.call(this);
-			return false;
-		});
+			// Bind the Show Attachment behavior to the title and to the Edit links
+			$('a.ij-post-attachment-edit').click(function() {
+				self.showAttachment.call(this);
+				return false;
+			});
 
-		// Bind the Remove Attachment behavior to the Remove link
-		$('a.ij-post-attachment-delete').click(function() {
-			self.removeAttachment.call(this);
-			return false;
-		});
+			// Bind the Remove Attachment behavior to the Remove link
+			$('a.ij-post-attachment-delete').click(function() {
+				self.removeAttachment.call(this);
+				return false;
+			});
+		};
+
+		this.setup();
 	}
 })(jQuery);
