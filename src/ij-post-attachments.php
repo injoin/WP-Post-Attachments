@@ -5,7 +5,7 @@
  *
  * @filesource
  * @since       0.0.1a
- * @version     0.0.1a
+ * @version     0.0.1b
  * @package     InJoin
  * @subpackage  Post Attachments
  */
@@ -15,7 +15,7 @@ Plugin Name: IJ Post Attachments
 Plugin URI: http://www.injoin.com.br
 Description: This is a simple WordPress plugin that will list the attachments of a post while editing it.
 Author: Gustavo Henke
-Version: 0.0.1a
+Version: 0.0.1b
 Author URI: http://www.injoin.com.br
 */
 
@@ -160,15 +160,19 @@ class IJ_Post_Attachments
 						data-title="<?php echo $atchment->post_title; ?>">
 						<div class="ij-post-attachment-title" title="<?php echo $atchment->post_title; ?>">
 							<a href="<?php echo wp_get_attachment_url($atchment->ID); ?>" class="ij-post-attachment-edit">
-								<strong><?php echo (strlen($atchment->post_title) > 16) ? (substr($atchment->post_title, 0, 16) . '...') : $atchment->post_title; ?></strong>
+								<strong><?php echo (strlen($atchment->post_title) > 22) ? (substr($atchment->post_title, 0, 22) . '...') : $atchment->post_title; ?></strong>
 							</a>
-							(<?php echo strtoupper(array_pop(explode('.', get_attached_file($atchment->ID)))); ?>)
 						</div>
-						<?php echo wp_get_attachment_image($atchment->ID, array(80, 60), true); ?>
-						<div style="float:left">
-							<a href="#" class="ij-post-attachment-insert"><?php _e('Insert'); ?></a><br />
-							<a href="<?php echo wp_get_attachment_url($atchment->ID); ?>" class="ij-post-attachment-edit"><?php _e('Edit'); ?></a><br />
-							<a href="<?php echo wp_nonce_url(admin_url('post.php') . '?action=delete&post=' . $atchment->ID, 'delete-attachment_' . $atchment->ID); ?>" class="ij-post-attachment-delete"><?php _e('Remove'); ?></a>
+						<div style="padding:1px 5px 5px">
+							<div class="ij-post-attachment-type">
+								<?php echo strtoupper(str_replace('image/', '', get_post_mime_type($atchment->ID))); ?>
+							</div>
+							<?php echo wp_get_attachment_image($atchment->ID, array(80, 60), true); ?>
+							<div style="float:left">
+								<a href="#" class="ij-post-attachment-insert"><?php _e('Insert'); ?></a><br />
+								<a href="<?php echo wp_get_attachment_url($atchment->ID); ?>" class="ij-post-attachment-edit"><?php _e('Edit'); ?></a><br />
+								<a href="<?php echo wp_nonce_url(admin_url('post.php') . '?action=delete&post=' . $atchment->ID, 'delete-attachment_' . $atchment->ID); ?>" class="ij-post-attachment-delete"><?php _e('Remove'); ?></a>
+							</div>
 						</div>
 					</li>
 				<?php endwhile; ?>
