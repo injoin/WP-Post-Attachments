@@ -2,8 +2,8 @@
 Contributors: dookan
 Tags: images, attachments
 Requires at least: 3.0.0
-Tested up to: 3.3.0
-Stable tag: 0.0.1a
+Tested up to: 3.4.1
+Stable tag: 0.0.1b
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,6 +27,11 @@ Would you like to help improving this plugin? If so, fork me on [GitHub](https:/
 1. That's all! You will note that below the editor inside a post an box entitled `Images and Attachments` will appear.
 
 == Changelog ==
+
+= 0.0.1b =
+* Enhanced the look of the items
+* Better control over the shown file type
+* Fixed styling bugs of the item in different OSs
 
 = 0.0.1a =
 * Initial release.
