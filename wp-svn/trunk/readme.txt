@@ -1,7 +1,7 @@
 === Plugin Name ===
 Contributors: dookan
-Tags: images, attachments
-Requires at least: 3.0.0
+Tags: images, attachments, intuitive
+Requires at least: 3.3.0
 Tested up to: 3.4.1
 Stable tag: 0.0.1b
 License: GPLv2 or later
