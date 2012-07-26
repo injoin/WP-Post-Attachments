@@ -1,17 +1,17 @@
-=== Plugin Name ===
+=== IJ Post Attachments ===
 Contributors: dookan
 Tags: images, attachments, intuitive
 Requires at least: 3.3.0
 Tested up to: 3.4.1
-Stable tag: 0.0.1b
+Stable tag: 0.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This is a simple WordPress plugin that will list the attachments of a post while editing it - no configuration needed! All post types are supported.
+This is a simple plugin that will list the attachments of a post while editing it - no configuration needed! All post types are supported.
 
 == Description ==
 
-This is a simple WordPress plugin that will list the attachments of a post while editing it. You need no configuration, the list will be automatically shown for all post types.
+This is a simple but useful plugin that will list the attachments of a post while editing it, in a more intuitive mode. You need no configuration, the list will be automatically shown for all post types.
 
 = Features =
 * Listing attachments of a post (no matter the attachment type - video, image, audio or anything else)
@@ -27,6 +27,9 @@ Would you like to help improving this plugin? If so, fork me on [GitHub](https:/
 1. That's all! You will note that below the editor inside a post an box entitled `Images and Attachments` will appear.
 
 == Changelog ==
+
+= 0.0.1 =
+* Less server payload and more PHPDoc content.
 
 = 0.0.1b =
 * Enhanced the look of the items
