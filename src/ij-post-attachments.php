@@ -5,7 +5,7 @@
  *
  * @filesource
  * @since       0.0.1a
- * @version     0.0.1b
+ * @version     0.0.1
  * @package     InJoin
  * @subpackage  Post Attachments
  */
@@ -15,7 +15,7 @@ Plugin Name: IJ Post Attachments
 Plugin URI: http://www.injoin.com.br
 Description: This is a simple WordPress plugin that will list the attachments of a post while editing it.
 Author: Gustavo Henke
-Version: 0.0.1b
+Version: 0.0.1
 Author URI: http://www.injoin.com.br
 */
 
@@ -101,19 +101,30 @@ class IJ_Post_Attachments
 		add_meta_box('ij-post-attachments', __('Images and Attachments'), array($this, 'printMetaBox'), null, 'normal', 'high');
 	}
 
+	/**
+	 * Enqueue the JS files needed by the plugin
+	 *
+	 * @since	0.0.1a
+	 * @return	void
+	 */
 	public function admin_enqueue_scripts()
 	{
 		global $hook_suffix;
 		if ($hook_suffix == 'post.php')
 		{
-			wp_enqueue_script('syoHintUtils', $this->pluginURL . 'scripts/utils.js', array(), '1.0.10');
-			wp_enqueue_script('syoHint', $this->pluginURL . 'scripts/jquery.syoHint.js', array('jquery', 'syoHintUtils'), '1.0.10');
+			wp_enqueue_script('syoHint', $this->pluginURL . 'scripts/jquery.syoHint.js', array('jquery'), '1.0.10');
 			wp_enqueue_script('ij-post-attachments', $this->pluginURL . 'scripts/ij-post-attachments.js', array('syoHint', 'jquery-ui-sortable'), '0.0.1');
 
 			wp_localize_script('ij-post-attachments', 'IJ_Post_Attachments_Vars', array('editMedia' => __('Edit Media')));
 		}
 	}
 
+	/**
+	 * Enqueue the plugin CSS
+	 *
+	 * @since	0.0.1a
+	 * @return	void
+	 */
 	public function admin_print_styles()
 	{
 		global $hook_suffix;
