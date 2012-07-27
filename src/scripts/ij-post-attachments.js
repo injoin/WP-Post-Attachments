@@ -113,7 +113,9 @@ var IJ_Post_Attachments;
 						title   : LI.data('title')
 					});
 			} else {
-				el = $('<a/>').text(LI.data('title')).attr('href', LI.data('url'));
+				el = $('<a/>')
+						.text(LI.data('title'))
+						.attr('href', LI.data('url'));
 			}
 
 			send_to_editor(el[0].outerHTML);
@@ -197,4 +199,5 @@ var IJ_Post_Attachments;
 
 		this.setup();
 	}
+
 })(jQuery);
