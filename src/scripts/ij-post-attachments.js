@@ -30,6 +30,12 @@ var IJ_Post_Attachments;
 		this.editMediaTitle = IJ_Post_Attachments_Vars.editMedia;
 
 		/**
+		 * Current post ID
+		 * @type {Number}
+		 */
+		this.postID = IJ_Post_Attachments_Vars.postID;
+
+		/**
 		 * Defines whether we're dragging around or not
 		 * @type {Boolean}
 		 */
@@ -121,7 +127,10 @@ var IJ_Post_Attachments;
 
 			// Because ThickBox removes everything after the TB_iframe parameter,
 			// its better to keep it at the last position
-			tb_show(self.editMediaTitle, self.pluginUrl + 'ij-post-attachments.php?width=630&height=440&attachment_id=' + ID + '&TB_iframe=1');
+			tb_show(
+				self.editMediaTitle,
+				self.pluginUrl + 'ij-post-attachments.php?width=630&height=440&attachment_id=' + ID + '&post_id=' + self.postID + 'TB_iframe=1'
+			);
 
 			return false;
 		};

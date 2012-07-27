@@ -113,9 +113,14 @@ class IJ_Post_Attachments
 		if ($hook_suffix == 'post.php')
 		{
 			wp_enqueue_script('syoHint', $this->pluginURL . 'scripts/jquery.syoHint.js', array('jquery'), '1.0.10');
-			wp_enqueue_script('ij-post-attachments', $this->pluginURL . 'scripts/ij-post-attachments.js', array('syoHint', 'jquery-ui-sortable'), '0.0.1');
+			wp_enqueue_script(
+				'ij-post-attachments', $this->pluginURL . 'scripts/ij-post-attachments.js',
+				array('syoHint', 'jquery-ui-sortable'), '0.0.1');
 
-			wp_localize_script('ij-post-attachments', 'IJ_Post_Attachments_Vars', array('editMedia' => __('Edit Media')));
+			wp_localize_script('ij-post-attachments', 'IJ_Post_Attachments_Vars', array(
+				'editMedia' => __('Edit Media'),
+				'postID'    => isset($_GET['post']) ? $_GET['post'] : 0
+			));
 		}
 	}
 
@@ -220,12 +225,19 @@ class IJ_Post_Attachments
 	 */
 	public function attachmentEditHeadIframe()
 	{
+		global $wp_scripts;
+		wp_default_scripts($wp_scripts);
+
 		// I don't know if all these scripts are really needed by the media edit screen.
 		// They're just there, so they'll be here too :P
 		?>
 		<link rel="stylesheet" type="text/css" href="<?php echo site_url('wp-includes/js/imgareaselect/imgareaselect.css'); ?>" />
-		<script type="text/javascript" src="<?php echo admin_url('load-scripts.php?load=jquery-color,imgareaselect,image-edit,wp-ajax-response'); ?>"></script>
+		<script type="text/javascript" src="<?php echo admin_url('load-scripts.php?load=jquery-color,imgareaselect,image-edit,wp-ajax-response,set-post-thumbnail'); ?>"></script>
 		<?php
+
+		// Add the needed vars to set the thumbnail :)
+		$wp_scripts->localize('set-post-thumbnail', 'post_id', $_GET['post_id']);
+		$wp_scripts->print_extra_script('set-post-thumbnail');
 	}
 
 	/**
