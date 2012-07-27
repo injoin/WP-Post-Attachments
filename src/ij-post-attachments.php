@@ -115,7 +115,8 @@ class IJ_Post_Attachments
 			wp_enqueue_script('syoHint', $this->pluginURL . 'scripts/jquery.syoHint.js', array('jquery'), '1.0.10');
 			wp_enqueue_script(
 				'ij-post-attachments', $this->pluginURL . 'scripts/ij-post-attachments.js',
-				array('syoHint', 'jquery-ui-sortable'), '0.0.1');
+				array('syoHint', 'jquery-ui-sortable'), '0.0.2a'
+			);
 
 			wp_localize_script('ij-post-attachments', 'IJ_Post_Attachments_Vars', array(
 				'editMedia' => __('Edit Media'),

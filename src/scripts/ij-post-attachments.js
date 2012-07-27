@@ -9,6 +9,8 @@ var IJ_Post_Attachments;
 	 * @constructor
 	 */
 	function InJoin_PostAttachments() {
+		"use strict";
+
 		var self = this;
 
 		/**
@@ -71,8 +73,9 @@ var IJ_Post_Attachments;
 						alignment = [],
 						loader = $('<img />');
 
-					for (; i < LI.length; i++)
+					for (; i < LI.length; i++) {
 						alignment.push(LI.eq(i).data('attachmentid'));
+					}
 
 					loader
 						.attr('src', userSettings.url + 'wp-admin/images/wpspin_light.gif')
