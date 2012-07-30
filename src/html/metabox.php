@@ -6,7 +6,7 @@
 	</p>
 	<?php if ($attachments->have_posts()): ?>
 	<div id="ij-post-attachments" class="ij-post-attachment-list">
-		<ul>
+		<ul class="alignleft">
 			<?php while ($attachments->have_posts()): $atchment = $attachments->next_post(); ?>
 			<li class="ij-post-attachment"
 			    data-mimetype="<?php echo $atchment->post_mime_type; ?>"
