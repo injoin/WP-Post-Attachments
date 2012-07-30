@@ -213,6 +213,10 @@ class IJ_Post_Attachments
 	{
 		add_action('admin_head-media-upload-popup', array($this, 'attachmentEditHeadIframe'));
 		wp_iframe(array($this, 'attachmentEditIframe'));
+
+		// Without the line below, the WP AJAX caller (admin-ajax.php) would print an '0'
+		// at the end of the request.
+		die;
 	}
 	//</editor-fold>
 
