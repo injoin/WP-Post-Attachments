@@ -4,8 +4,8 @@
  * This is a simple WordPress plugin that will list the attachments of a post while editing it.
  *
  * @filesource
- * @since       0.0.1a
- * @version     0.0.1
+ * @since       0.0.2a
+ * @version     0.0.2
  * @package     InJoin
  * @subpackage  Post Attachments
  */
@@ -15,13 +15,16 @@ Plugin Name: IJ Post Attachments
 Plugin URI: http://www.injoin.com.br
 Description: This is a simple WordPress plugin that will list the attachments of a post while editing it.
 Author: Gustavo Henke
-Version: 0.0.1
+Version: 0.0.2
 Author URI: http://www.injoin.com.br
 */
+
+define('IJ_POST_ATTACHMENTS_DIR', dirname(__FILE__));
 
 class IJ_Post_Attachments
 {
 
+	//<editor-fold desc="Properties">
 	/**
 	 * List of methods that are WP actions.
 	 *
@@ -30,7 +33,7 @@ class IJ_Post_Attachments
 	 */
 	private $actions = array(
 		'add_meta_boxes', 'admin_print_styles', 'admin_enqueue_scripts',
-		'wp_ajax_ij_realign'
+		'wp_ajax_ij_realign', 'wp_ajax_ij_attachment_edit'
 	);
 
 	/**
@@ -48,7 +51,9 @@ class IJ_Post_Attachments
 	 * @var     IJ_Post_Attachments
 	 */
 	private static $instance;
+	//</editor-fold>
 
+	//<editor-fold desc="Basic methods">
 	/**
 	 * Constructor
 	 *
@@ -70,7 +75,7 @@ class IJ_Post_Attachments
 	 * @since   0.0.1a
 	 * @return  IJ_Post_Attachments
 	 */
-	public static function getInstance()
+	static public function getInstance()
 	{
 		if (!isset(self::$instance))
 			self::$instance = new IJ_Post_Attachments();
@@ -89,7 +94,9 @@ class IJ_Post_Attachments
 	{
 		throw new Exception("Clone is disallowed.");
 	}
+	//</editor-fold>
 
+	//<editor-fold desc="Metabox">
 	/**
 	 * Add the plugin meta box
 	 *
@@ -98,7 +105,10 @@ class IJ_Post_Attachments
 	 */
 	public function add_meta_boxes()
 	{
-		add_meta_box('ij-post-attachments', __('Images and Attachments'), array($this, 'printMetaBox'), null, 'normal', 'high');
+		add_meta_box(
+			'ij-post-attachments', __('Images and Attachments'),
+			array($this, 'printMetaBox'), null, 'normal', 'high'
+		);
 	}
 
 	/**
@@ -110,19 +120,19 @@ class IJ_Post_Attachments
 	public function admin_enqueue_scripts()
 	{
 		global $hook_suffix;
-		if ($hook_suffix == 'post.php')
-		{
-			wp_enqueue_script('syoHint', $this->pluginURL . 'scripts/jquery.syoHint.js', array('jquery'), '1.0.10');
-			wp_enqueue_script(
-				'ij-post-attachments', $this->pluginURL . 'scripts/ij-post-attachments.js',
-				array('syoHint', 'jquery-ui-sortable'), '0.0.2a'
-			);
+		if ($hook_suffix != 'post.php')
+			return;
 
-			wp_localize_script('ij-post-attachments', 'IJ_Post_Attachments_Vars', array(
-				'editMedia' => __('Edit Media'),
-				'postID'    => isset($_GET['post']) ? $_GET['post'] : 0
-			));
-		}
+		wp_enqueue_script('syoHint', $this->pluginURL . 'scripts/jquery.syoHint.js', array('jquery'), '1.0.10');
+		wp_enqueue_script(
+			'ij-post-attachments', $this->pluginURL . 'scripts/ij-post-attachments.js',
+			array('syoHint', 'jquery-ui-sortable'), '0.0.2a'
+		);
+
+		wp_localize_script('ij-post-attachments', 'IJ_Post_Attachments_Vars', array(
+			'editMedia' => __('Edit Media'),
+			'postID'    => isset($_GET['post']) ? $_GET['post'] : 0
+		));
 	}
 
 	/**
@@ -147,14 +157,6 @@ class IJ_Post_Attachments
 	 */
 	public function printMetaBox($post)
 	{
-		?>
-		<p>
-			<a href="<?php echo admin_url('media-upload.php?post_id=' . $post->ID); ?>&TB_iframe=1&width=640&height=693"
-				onclick="return false" class="button-primary thickbox">
-				<?php _e('Add Media'); ?>
-			</a>
-		</p>
-		<?php
 		$attachments = new WP_Query(array(
 			'post_parent'   => $post->ID,
 			'post_type'     => 'attachment',
@@ -163,61 +165,11 @@ class IJ_Post_Attachments
 			'order'         => 'ASC'
 		));
 
-		if ($attachments->have_posts())
-		{
-			?>
-			<div id="ij-post-attachments" class="ij-post-attachment-list">
-				<ul>
-				<?php while ($attachments->have_posts()): $atchment = $attachments->next_post(); ?>
-					<li class="ij-post-attachment"
-					    data-mimetype="<?php echo $atchment->post_mime_type; ?>"
-					    data-alt="<?php echo get_post_meta(611, '_wp_attachment_image_alt', true); ?>"
-					    data-attachmentid="<?php echo $atchment->ID; ?>"
-					    data-url="<?php echo wp_get_attachment_url($atchment->ID); ?>"
-						data-title="<?php echo $atchment->post_title; ?>">
-						<div class="ij-post-attachment-title" title="<?php echo $atchment->post_title; ?>">
-							<a href="<?php echo wp_get_attachment_url($atchment->ID); ?>" class="ij-post-attachment-edit">
-								<strong><?php echo (strlen($atchment->post_title) > 22) ? (substr($atchment->post_title, 0, 22) . '...') : $atchment->post_title; ?></strong>
-							</a>
-						</div>
-						<div style="padding:1px 5px 5px">
-							<div class="ij-post-attachment-type">
-								<?php echo strtoupper(str_replace('image/', '', get_post_mime_type($atchment->ID))); ?>
-							</div>
-							<?php echo wp_get_attachment_image($atchment->ID, array(80, 60), true); ?>
-							<div style="float:left">
-								<a href="#" class="ij-post-attachment-insert"><?php _e('Insert'); ?></a><br />
-								<a href="<?php echo wp_get_attachment_url($atchment->ID); ?>" class="ij-post-attachment-edit"><?php _e('Edit'); ?></a><br />
-								<a href="<?php echo wp_nonce_url(admin_url('post.php') . '?action=delete&post=' . $atchment->ID, 'delete-attachment_' . $atchment->ID); ?>" class="ij-post-attachment-delete"><?php _e('Remove'); ?></a>
-							</div>
-						</div>
-					</li>
-				<?php endwhile; ?>
-				</ul>
-				<div class="clear"></div>
-			</div>
-			<?php
-		}
-		else
-		{
-			// Nothing found, let's go the easier way
-			echo "<p>" . __('No media attachments found.') . "</p>";
-		}
+		include IJ_POST_ATTACHMENTS_DIR . '/html/metabox.php';
 	}
+	//</editor-fold>
 
-	/**
-	 * Initialize the attachment edit pop-up.
-	 *
-	 * @since   0.0.1a
-	 * @param   int $ID
-	 * @return  void
-	 */
-	public function showAttachmentEdit($ID)
-	{
-		add_action('admin_head-media-upload-popup', array($this, 'attachmentEditHeadIframe'));
-		wp_iframe(array($this, 'attachmentEditIframe'));
-	}
-
+	//<editor-fold desc="Attachment Edition Screen">
 	/**
 	 * Output the script/link tags needed by the edit iframe
 	 *
@@ -231,10 +183,7 @@ class IJ_Post_Attachments
 
 		// I don't know if all these scripts are really needed by the media edit screen.
 		// They're just there, so they'll be here too :P
-		?>
-		<link rel="stylesheet" type="text/css" href="<?php echo site_url('wp-includes/js/imgareaselect/imgareaselect.css'); ?>" />
-		<script type="text/javascript" src="<?php echo admin_url('load-scripts.php?load=jquery-color,imgareaselect,image-edit,wp-ajax-response,set-post-thumbnail'); ?>"></script>
-		<?php
+		include IJ_POST_ATTACHMENTS_DIR . '/html/attachmentEditHead.php';
 
 		// Add the needed vars to set the thumbnail :)
 		$wp_scripts->localize('set-post-thumbnail', 'post_id', $_GET['post_id']);
@@ -251,25 +200,23 @@ class IJ_Post_Attachments
 	{
 		$url    = admin_url('media.php');
 		$id     = $_REQUEST['attachment_id'];
-		?>
-		<form action="<?php echo $url; ?>" method="post" style="padding:0 10px 10px" class="media-item">
-			<div class="submit"><input type="submit" class="button-primary" value="<?php _e('Update Media'); ?>" /></div>
-			<input type="hidden" name="action" value="editattachment" />
-			<input type="hidden" name="attachment_id" value="<?php echo $id; ?>" />
-		<?php
-			wp_nonce_field('media-form');
-			wp_original_referer_field(true, 'current');
-
-			echo get_media_item($id, array(
-				'toggle'        => false,
-				'show_title'    => false
-			));
-		?>
-			<div class="submit"><input type="submit" class="button-primary" value="<?php _e('Update Media'); ?>" /></div>
-		</form>
-		<?php
+		include IJ_POST_ATTACHMENTS_DIR . '/html/attachmentEditIframe.php';
 	}
 
+	/**
+	 * Initialize the attachment edit pop-up.
+	 *
+	 * @since   0.0.1a
+	 * @return  void
+	 */
+	public function wp_ajax_ij_attachment_edit()
+	{
+		add_action('admin_head-media-upload-popup', array($this, 'attachmentEditHeadIframe'));
+		wp_iframe(array($this, 'attachmentEditIframe'));
+	}
+	//</editor-fold>
+
+	//<editor-fold desc="Attachment sorting">
 	/**
 	 * Re-align attachments.
 	 *
@@ -287,8 +234,7 @@ class IJ_Post_Attachments
 		$alignment = array_values($alignment);
 		$count = count($alignment);
 
-		for ($i = 0; $i < $count; $i++)
-		{
+		for ($i = 0; $i < $count; $i++) {
 			if (!is_numeric($alignment[$i]))
 				continue;
 
@@ -297,14 +243,8 @@ class IJ_Post_Attachments
 			wp_update_post($attachment);
 		}
 	}
+	//</editor-fold>
 
 }
 
-// Direct access + editing image
-require_once(dirname(__FILE__) . '/../../../wp-load.php');
 $IJ_Post_Attachments = IJ_Post_Attachments::getInstance();
-if (strpos(str_replace('\\', '/', __FILE__), $_SERVER['PHP_SELF']) && isset($_REQUEST['attachment_id']))
-{
-	require_once(dirname(__FILE__) . '/../../../wp-admin/admin.php');
-	$IJ_Post_Attachments->showAttachmentEdit($_REQUEST['attachment_id']);
-}

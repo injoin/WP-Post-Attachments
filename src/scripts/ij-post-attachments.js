@@ -134,7 +134,7 @@ var IJ_Post_Attachments;
 			// its better to keep it at the last position
 			tb_show(
 				self.editMediaTitle,
-				self.pluginUrl + 'ij-post-attachments.php?width=630&height=440&attachment_id=' + ID + '&post_id=' + self.postID + 'TB_iframe=1'
+				ajaxurl + '?action=ij_attachment_edit&width=630&height=440&attachment_id=' + ID + '&post_id=' + self.postID + 'TB_iframe=1'
 			);
 
 			return false;
