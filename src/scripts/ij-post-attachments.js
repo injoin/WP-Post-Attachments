@@ -9,6 +9,8 @@ var IJ_Post_Attachments;
 	 * @constructor
 	 */
 	function InJoin_PostAttachments() {
+		"use strict";
+
 		var self = this;
 
 		/**
@@ -28,6 +30,12 @@ var IJ_Post_Attachments;
 		 * @type {String}
 		 */
 		this.editMediaTitle = IJ_Post_Attachments_Vars.editMedia;
+
+		/**
+		 * Current post ID
+		 * @type {Number}
+		 */
+		this.postID = IJ_Post_Attachments_Vars.postID;
 
 		/**
 		 * Defines whether we're dragging around or not
@@ -65,8 +73,9 @@ var IJ_Post_Attachments;
 						alignment = [],
 						loader = $('<img />');
 
-					for (; i < LI.length; i++)
+					for (; i < LI.length; i++) {
 						alignment.push(LI.eq(i).data('attachmentid'));
+					}
 
 					loader
 						.attr('src', userSettings.url + 'wp-admin/images/wpspin_light.gif')
@@ -104,7 +113,9 @@ var IJ_Post_Attachments;
 						title   : LI.data('title')
 					});
 			} else {
-				el = $('<a/>').text(LI.data('title')).attr('href', LI.data('url'));
+				el = $('<a/>')
+						.text(LI.data('title'))
+						.attr('href', LI.data('url'));
 			}
 
 			send_to_editor(el[0].outerHTML);
@@ -121,7 +132,10 @@ var IJ_Post_Attachments;
 
 			// Because ThickBox removes everything after the TB_iframe parameter,
 			// its better to keep it at the last position
-			tb_show(self.editMediaTitle, self.pluginUrl + 'ij-post-attachments.php?width=630&height=440&attachment_id=' + ID + '&TB_iframe=1');
+			tb_show(
+				self.editMediaTitle,
+				ajaxurl + '?action=ij_attachment_edit&width=630&height=440&attachment_id=' + ID + '&post_id=' + self.postID + 'TB_iframe=1'
+			);
 
 			return false;
 		};
@@ -185,4 +199,5 @@ var IJ_Post_Attachments;
 
 		this.setup();
 	}
+
 })(jQuery);
