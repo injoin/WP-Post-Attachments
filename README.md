@@ -18,5 +18,6 @@ Features
 Installation
 ---
 1. Upload the `ij-post-attachments` directory to the `/wp-content/plugins/` directory
-1. Activate the plugin through the `Plugins` menu in WordPress administration
-1. That's all! You will note that below the editor inside a post an box entitled `Images and Attachments` will appear.
+	* Alternatively, you can search for "IJ Post Attachments" in the WP administrator's menu `Plugins`/`Add New`
+1. Activate the plugin through the `Plugins` menu in WP administration
+1. That's all! You will note that, while editing a post, below its editor, an box entitled `Images and Attachments` will appear.
