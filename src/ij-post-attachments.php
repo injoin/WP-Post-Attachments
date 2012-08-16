@@ -4,8 +4,8 @@
  * This is a simple WordPress plugin that will list the attachments of a post while editing it.
  *
  * @filesource
- * @since       0.0.2a
- * @version     0.0.2
+ * @since       0.0.1a
+ * @version     0.1.0b
  * @package     InJoin
  * @subpackage  Post Attachments
  */
@@ -15,11 +15,15 @@ Plugin Name: IJ Post Attachments
 Plugin URI: http://www.injoin.com.br
 Description: This is a simple WordPress plugin that will list the attachments of a post while editing it.
 Author: Gustavo Henke
-Version: 0.0.2
+Version: 0.1.0b
 Author URI: http://www.injoin.com.br
 */
 
+//<editor-fold desc="Constants">
 define('IJ_POST_ATTACHMENTS_DIR', dirname(__FILE__));
+define('IJ_POST_ATTACHMENTS_URL', plugin_dir_url(__FILE__));
+define('IJ_POST_ATTACHMENTS_VER', '0.1.0b');
+//</editor-fold>
 
 class IJ_Post_Attachments
 {
@@ -35,14 +39,6 @@ class IJ_Post_Attachments
 		'add_meta_boxes', 'admin_print_styles', 'admin_enqueue_scripts',
 		'wp_ajax_ij_realign', 'wp_ajax_ij_attachment_edit'
 	);
-
-	/**
-	 * The URL to the plugin directory
-	 *
-	 * @since   0.0.1a
-	 * @var     string
-	 */
-	private $pluginURL;
 
 	/**
 	 * The singleton instance of this class
@@ -64,8 +60,6 @@ class IJ_Post_Attachments
 	{
 		foreach ($this->actions as $action)
 			add_action($action, array($this, $action));
-
-		$this->pluginURL = plugin_dir_url(__FILE__);
 	}
 
 	/**
@@ -123,10 +117,10 @@ class IJ_Post_Attachments
 		if ($hook_suffix != 'post.php')
 			return;
 
-		wp_enqueue_script('syoHint', $this->pluginURL . 'scripts/jquery.syoHint.js', array('jquery'), '1.0.10');
+		wp_enqueue_script('syoHint', IJ_POST_ATTACHMENTS_URL . 'scripts/jquery.syoHint.js', array('jquery'), '1.0.10');
 		wp_enqueue_script(
-			'ij-post-attachments', $this->pluginURL . 'scripts/ij-post-attachments.js',
-			array('syoHint', 'jquery-ui-sortable'), '0.0.2a'
+			'ij-post-attachments', IJ_POST_ATTACHMENTS_URL . 'scripts/ij-post-attachments.js',
+			array('syoHint', 'jquery-ui-sortable'), IJ_POST_ATTACHMENTS_VER
 		);
 
 		wp_localize_script('ij-post-attachments', 'IJ_Post_Attachments_Vars', array(
@@ -145,7 +139,7 @@ class IJ_Post_Attachments
 	{
 		global $hook_suffix;
 		if ($hook_suffix == 'post.php')
-			wp_enqueue_style('ij-post-attachments', $this->pluginURL . 'styles/ij-post-attachments.css', array(), '0.0.1');
+			wp_enqueue_style('ij-post-attachments', IJ_POST_ATTACHMENTS_URL . 'styles/ij-post-attachments.css', array(), IJ_POST_ATTACHMENTS_VER);
 	}
 
 	/**

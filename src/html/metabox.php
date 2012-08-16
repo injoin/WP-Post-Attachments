@@ -10,15 +10,15 @@
 			<?php while ($attachments->have_posts()): $atchment = $attachments->next_post(); ?>
 			<li class="ij-post-attachment"
 			    data-mimetype="<?php echo $atchment->post_mime_type; ?>"
-			    data-alt="<?php echo get_post_meta(611, '_wp_attachment_image_alt', true); ?>"
+			    data-alt="<?php echo esc_attr(get_post_meta(611, '_wp_attachment_image_alt', true)); ?>"
 			    data-attachmentid="<?php echo $atchment->ID; ?>"
 			    data-url="<?php echo wp_get_attachment_url($atchment->ID); ?>"
-			    data-title="<?php echo $atchment->post_title; ?>">
+			    data-title="<?php echo esc_attr($atchment->post_title); ?>">
 
 				<!--Item title-->
-				<div class="ij-post-attachment-title" title="<?php echo $atchment->post_title; ?>">
+				<div class="ij-post-attachment-title" title="<?php echo esc_attr($atchment->post_title); ?>">
 					<a href="<?php echo wp_get_attachment_url($atchment->ID); ?>" class="ij-post-attachment-edit">
-						<strong><?php echo (strlen($atchment->post_title) > 22) ? (substr($atchment->post_title, 0, 22) . '...') : $atchment->post_title; ?></strong>
+						<strong><?php echo (strlen($atchment->post_title) > 22) ? (substr(esc_html($atchment->post_title), 0, 22) . '...') : esc_html($atchment->post_title); ?></strong>
 					</a>
 				</div>
 
