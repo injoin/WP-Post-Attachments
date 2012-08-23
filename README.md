@@ -7,7 +7,7 @@ You need no configuration, the list will be automatically shown for all post typ
 Please visit the plugin page in the [WordPress.org website](http://wordpress.org/extend/plugins/ij-post-attachments) also!
 If you would like to improve this plugin, _y u no_ fork me? :)
 
-__Current stable version:__ 0.0.1
+__Current stable version:__ 0.1.0
 
 Features
 ---

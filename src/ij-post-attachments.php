@@ -5,7 +5,7 @@
  *
  * @filesource
  * @since       0.0.1a
- * @version     0.1.0b
+ * @version     0.1.0
  * @package     InJoin
  * @subpackage  Post Attachments
  */
@@ -15,14 +15,14 @@ Plugin Name: IJ Post Attachments
 Plugin URI: http://www.injoin.com.br
 Description: This is a simple WordPress plugin that will list the attachments of a post while editing it.
 Author: Gustavo Henke
-Version: 0.1.0b
+Version: 0.1.0
 Author URI: http://www.injoin.com.br
 */
 
 //<editor-fold desc="Constants">
 define('IJ_POST_ATTACHMENTS_DIR', dirname(__FILE__));
 define('IJ_POST_ATTACHMENTS_URL', plugin_dir_url(__FILE__));
-define('IJ_POST_ATTACHMENTS_VER', '0.1.0b');
+define('IJ_POST_ATTACHMENTS_VER', '0.1.0');
 //</editor-fold>
 
 class IJ_Post_Attachments

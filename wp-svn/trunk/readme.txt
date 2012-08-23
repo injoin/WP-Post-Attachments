@@ -3,7 +3,7 @@ Contributors: dookan
 Tags: images, attachments, intuitive
 Requires at least: 3.3.0
 Tested up to: 3.4.1
-Stable tag: 0.0.1
+Stable tag: 0.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,10 +23,17 @@ Would you like to help improving this plugin? If so, fork me on [GitHub](https:/
 == Installation ==
 
 1. Upload the `ij-post-attachments` directory to the `/wp-content/plugins/` directory
+	* Alternatively, you can search for "IJ Post Attachments" in the WP administrator's menu `Plugins`/`Add New`
 1. Activate the plugin through the 'Plugins' menu in WordPress
 1. That's all! You will note that below the editor inside a post an box entitled `Images and Attachments` will appear.
 
 == Changelog ==
+
+= 0.1.0 =
+* `Use as Thumbnail` link made available in the attachment edition screen
+* HTML moved to separate files to enhance class readability
+* Code compliant to [JSHint](http://www.jshint.com/) and [PSR-2](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md)
+* Escaping fixes
 
 = 0.0.1 =
 * Less server payload and more PHPDoc content.
